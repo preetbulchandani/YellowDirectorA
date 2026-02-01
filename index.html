@@ -3,88 +3,245 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Important Question</title>
+  <title>Crucial Decision</title>
   <style>
-    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    body {
-      margin: 0; min-height: 100vh; display: grid; place-items: center;
-      background: #fff; color: #111;
+    :root {
+      --bg: #0b0b10;
+      --card: rgba(255,255,255,0.06);
+      --card2: rgba(255,255,255,0.10);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.70);
+      --line: rgba(255,255,255,0.14);
+      --shadow: 0 18px 60px rgba(0,0,0,0.45);
+      --radius: 22px;
     }
-    .card {
-      width: min(560px, 92vw);
-      border: 1px solid #eee;
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.06);
-      text-align: center;
-    }
-    h1 { margin: 0 0 10px; font-size: 34px; letter-spacing: -0.02em; }
-    p { margin: 0 0 22px; opacity: .8; line-height: 1.4; }
-    .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    button {
-      border: 0; border-radius: 999px; padding: 14px 22px;
-      font-size: 16px; cursor: pointer;
-      transition: transform .08s ease, filter .2s ease, opacity .2s ease;
-    }
-    #yes {
-      background: #111; color: #fff;
-    }
-    #yes:active { transform: scale(.98); }
 
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(900px 500px at 20% 15%, rgba(255, 68, 130, 0.18), transparent 55%),
+        radial-gradient(800px 450px at 80% 20%, rgba(90, 130, 255, 0.16), transparent 55%),
+        radial-gradient(900px 600px at 50% 85%, rgba(80, 255, 180, 0.10), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .card {
+      width: min(640px, 92vw);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,0.03));
+      border-radius: var(--radius);
+      padding: 30px 26px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .glow {
+      position: absolute;
+      inset: -120px;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 68, 130, 0.18), transparent 45%),
+                  radial-gradient(circle at 70% 40%, rgba(90, 130, 255, 0.14), transparent 50%);
+      filter: blur(16px);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 16px 0 10px;
+      font-size: clamp(30px, 4.8vw, 40px);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 16px;
+    }
+
+    .spacer { height: 18px; }
+
+    .step {
+      display: none;
+      animation: rise .32s ease both;
+    }
+    .step.active { display: block; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      transition: transform .08s ease, filter .2s ease, opacity .2s ease, background .2s ease;
+      user-select: none;
+    }
+    button:hover { background: rgba(255,255,255,0.10); }
+    button:active { transform: scale(.98); }
+
+    .primary {
+      border: none;
+      background: linear-gradient(135deg, rgba(255,68,130,0.95), rgba(130,90,255,0.95));
+      box-shadow: 0 10px 30px rgba(255, 68, 130, 0.18);
+    }
+    .primary:hover { filter: brightness(1.05); }
+
+    /* Valentine button row */
     #no {
-      background: #f3f3f3; color: #111;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
       position: relative;
     }
-    /* When "No" is attempted, we blur it */
-    .blurred {
-      filter: blur(7px);
-      opacity: .55;
-      pointer-events: none; /* makes it unusable */
-    }
 
-    .tiny {
-      margin-top: 16px;
-      font-size: 12px;
+    .blurred {
+      filter: blur(8px);
       opacity: .55;
+      pointer-events: none;
     }
 
     .success {
       display: none;
       margin-top: 18px;
-      padding: 16px;
-      border-radius: 14px;
-      background: #f7f7f7;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      animation: rise .32s ease both;
     }
-    .success strong { display: block; margin-bottom: 6px; }
+    .success strong {
+      display: block;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .tiny {
+      margin-top: 18px;
+      font-size: 12px;
+      opacity: .55;
+      text-align: center;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 18px 0;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Will you be my Valentine?</h1>
-    <p>Choose wisely. There is a correct answer.</p>
+    <div class="glow"></div>
 
-    <div class="buttons">
-      <button id="yes">YES 💘</button>
-      <button id="no">No</button>
-    </div>
+    <!-- STEP 1 -->
+    <section class="step active" id="step1">
+      <span class="badge">⚠️ System Alert</span>
+      <h1>Bumstand has reached a crucial point.</h1>
+      <p>There is a decision to be made here.</p>
 
-    <div class="success" id="success">
-      <strong>Correct.</strong>
-      <div>Now screenshot this and send it to me as proof 😌</div>
-    </div>
+      <div class="buttons">
+        <button class="primary" id="to2">Proceed</button>
+      </div>
 
-    <div class="tiny">This website is legally binding in the court of romance.</div>
+      <div class="tiny">This page is monitored by the Department of Romance.</div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" id="step2">
+      <span class="badge">🗳️ Decision Mode</span>
+      <h1>What decision?</h1>
+      <p>Only one answer leads to peace, joy, and suspiciously good photos.</p>
+
+      <div class="buttons">
+        <button class="primary" id="to3">Show me</button>
+      </div>
+
+      <div class="tiny">Choose wisely. The universe is watching.</div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" id="step3">
+      <span class="badge">💘 Final Question</span>
+      <h1>Will you be my Valentine?</h1>
+      <p>You may attempt to select “No”. You will not succeed.</p>
+
+      <div class="buttons">
+        <button class="primary" id="yes">YES 💘</button>
+        <button id="no">No</button>
+      </div>
+
+      <div class="success" id="success">
+        <strong>Correct.</strong>
+        <div>Now screenshot this and send it to me as proof 😌</div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="tiny">This decision is legally binding in the court of Bumstand.</div>
+    </section>
   </div>
 
   <script>
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const step3 = document.getElementById("step3");
+
+    const to2 = document.getElementById("to2");
+    const to3 = document.getElementById("to3");
+
     const yes = document.getElementById("yes");
     const no = document.getElementById("no");
     const success = document.getElementById("success");
 
-    // Make "No" blur as soon as he tries anything: hover, touch, click
+    const showStep = (n) => {
+      [step1, step2, step3].forEach(s => s.classList.remove("active"));
+      if (n === 1) step1.classList.add("active");
+      if (n === 2) step2.classList.add("active");
+      if (n === 3) step3.classList.add("active");
+    };
+
+    to2.addEventListener("click", () => showStep(2));
+    to3.addEventListener("click", () => showStep(3));
+
+    // "No" blurs the moment he tries anything
     const disableNo = () => {
       no.classList.add("blurred");
-      // Optional: move focus to YES so it's the only obvious choice
       yes.focus();
     };
 
@@ -95,10 +252,9 @@
 
     yes.addEventListener("click", () => {
       success.style.display = "block";
-      // Optional: confetti-ish vibe without libraries
       yes.textContent = "YES 💘 (locked in)";
       yes.disabled = true;
-      yes.style.opacity = "0.85";
+      yes.style.opacity = "0.88";
     });
   </script>
 </body>
