@@ -3,20 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Crucial Decision</title>
-  <meta name="description" content="A very serious question with romantic consequences." />
+  <title>Emergency for Bumstand</title>
+  <meta name="description" content="A crucial decision must be made." />
 
   <style>
     :root{
-      --bg:#0b0c10;
+      --bg:#07080c;
       --card:rgba(255,255,255,.06);
-      --card2:rgba(255,255,255,.10);
       --line:rgba(255,255,255,.14);
       --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
+      --muted:rgba(255,255,255,.72);
       --muted2:rgba(255,255,255,.55);
-      --shadow: 0 22px 70px rgba(0,0,0,.45);
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
       --r: 22px;
+
+      --hot: rgba(255, 60, 120, .95);
+      --cold: rgba(120, 90, 255, .95);
+      --warn: rgba(255, 80, 60, .95);
+      --ok: rgba(80, 255, 180, .90);
     }
 
     *{ box-sizing:border-box; }
@@ -29,22 +33,31 @@
       color:var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       background:
-        radial-gradient(900px 500px at 20% 15%, rgba(255, 68, 130, .18), transparent 55%),
-        radial-gradient(800px 450px at 85% 18%, rgba(90, 130, 255, .16), transparent 55%),
-        radial-gradient(900px 600px at 50% 88%, rgba(80, 255, 180, .10), transparent 55%),
+        radial-gradient(950px 520px at 20% 15%, rgba(255, 60, 120, .18), transparent 55%),
+        radial-gradient(900px 480px at 85% 16%, rgba(120, 90, 255, .16), transparent 55%),
+        radial-gradient(1000px 700px at 50% 90%, rgba(80, 255, 180, .10), transparent 55%),
         var(--bg);
       overflow-x:hidden;
     }
 
+    /* Confetti canvas sits on top */
+    #confettiCanvas{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+
     .wrap{
-      width:min(720px, 92vw);
+      width:min(760px, 92vw);
       padding: 34px 0;
+      position: relative;
     }
 
     .card{
       position:relative;
       border:1px solid var(--line);
-      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.03));
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
       border-radius: var(--r);
       box-shadow: var(--shadow);
       overflow:hidden;
@@ -53,33 +66,91 @@
 
     .glow{
       position:absolute;
-      inset:-140px;
+      inset:-160px;
       background:
-        radial-gradient(circle at 25% 25%, rgba(255,68,130,.22), transparent 45%),
-        radial-gradient(circle at 75% 35%, rgba(90,130,255,.18), transparent 48%),
-        radial-gradient(circle at 50% 80%, rgba(80,255,180,.10), transparent 50%);
+        radial-gradient(circle at 22% 22%, rgba(255,60,120,.22), transparent 45%),
+        radial-gradient(circle at 78% 30%, rgba(120,90,255,.18), transparent 48%),
+        radial-gradient(circle at 50% 82%, rgba(80,255,180,.10), transparent 50%);
       filter: blur(18px);
-      opacity:.9;
+      opacity:.95;
       pointer-events:none;
+    }
+
+    /* “Emergency scanline” overlay */
+    .scan{
+      position:absolute;
+      inset:0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.05),
+        rgba(255,255,255,.05) 1px,
+        transparent 1px,
+        transparent 6px
+      );
+      opacity:.06;
+      pointer-events:none;
+      mix-blend-mode: overlay;
+      animation: scanMove 4s linear infinite;
+    }
+    @keyframes scanMove{
+      from{ transform: translateY(-16px); }
+      to{ transform: translateY(16px); }
     }
 
     header{
       position:relative;
       padding: 22px 22px 0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
     }
 
     .badge{
       display:inline-flex;
       align-items:center;
-      gap:8px;
-      padding: 8px 12px;
+      gap:10px;
+      padding: 9px 12px;
       border-radius: 999px;
       border:1px solid var(--line);
       background: rgba(255,255,255,.06);
       color: var(--muted);
       font-size: 12px;
-      letter-spacing: .08em;
+      letter-spacing: .10em;
       text-transform: uppercase;
+      user-select:none;
+      white-space: nowrap;
+    }
+
+    .badge .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--warn);
+      box-shadow: 0 0 0 rgba(255, 80, 60, 0);
+    }
+
+    /* Emergency badge animation */
+    .badge.emergency{
+      border-color: rgba(255, 80, 60, .35);
+      background: rgba(255, 80, 60, .10);
+      color: rgba(255,255,255,.86);
+      animation: pulseBadge 1.15s ease-in-out infinite;
+    }
+    .badge.emergency .dot{
+      animation: pulseDot 1.15s ease-in-out infinite;
+    }
+    @keyframes pulseBadge{
+      0%,100% { transform: translateY(0); filter: brightness(1); }
+      50% { transform: translateY(-1px); filter: brightness(1.12); }
+    }
+    @keyframes pulseDot{
+      0%,100% { box-shadow: 0 0 0 0 rgba(255, 80, 60, .0); }
+      50% { box-shadow: 0 0 18px 6px rgba(255, 80, 60, .25); }
+    }
+
+    .status{
+      font-size: 12px;
+      color: var(--muted2);
+      letter-spacing: .04em;
       user-select:none;
     }
 
@@ -90,7 +161,7 @@
 
     h1{
       margin: 14px 0 10px;
-      font-size: clamp(30px, 4.8vw, 44px);
+      font-size: clamp(30px, 4.8vw, 46px);
       letter-spacing: -0.04em;
       line-height: 1.05;
     }
@@ -98,7 +169,7 @@
     p{
       margin:0;
       color:var(--muted);
-      line-height:1.5;
+      line-height:1.55;
       font-size: 16px;
     }
 
@@ -119,13 +190,34 @@
     /* Steps */
     .step{
       display:none;
-      animation: rise .34s ease both;
+      animation: rise .42s cubic-bezier(.2,.8,.2,1) both;
     }
     .step.active{ display:block; }
 
     @keyframes rise{
-      from{ opacity:0; transform: translateY(10px); }
-      to{ opacity:1; transform: translateY(0); }
+      from{ opacity:0; transform: translateY(12px); filter: blur(2px); }
+      to{ opacity:1; transform: translateY(0); filter: blur(0); }
+    }
+
+    /* Suspense text animation */
+    .suspense{
+      display:inline-block;
+      position: relative;
+    }
+    .suspense::after{
+      content:"";
+      position:absolute;
+      left:0; bottom:-6px;
+      width:100%;
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+      opacity:.7;
+      animation: sweep 1.8s ease-in-out infinite;
+    }
+    @keyframes sweep{
+      0% { transform: translateX(-20%); opacity:.25; }
+      50% { transform: translateX(0%); opacity:.9; }
+      100% { transform: translateX(20%); opacity:.25; }
     }
 
     /* Buttons */
@@ -135,6 +227,7 @@
       justify-content:center;
       flex-wrap:wrap;
       margin-top: 18px;
+      position: relative;
     }
 
     button{
@@ -149,29 +242,97 @@
       user-select:none;
       -webkit-tap-highlight-color: transparent;
     }
-    button:hover{ background: rgba(255,255,255,.11); }
+    button:hover{ background: rgba(255,255,255,.12); }
     button:active{ transform: scale(.98); }
 
     .primary{
       border:none;
-      background: linear-gradient(135deg, rgba(255,68,130,.96), rgba(130,90,255,.96));
-      box-shadow: 0 12px 34px rgba(255,68,130,.18);
+      background: linear-gradient(135deg, var(--hot), var(--cold));
+      box-shadow: 0 12px 34px rgba(255,60,120,.18);
     }
     .primary:hover{ filter: brightness(1.06); }
 
-    .ghost{
-      background: rgba(255,255,255,.06);
-    }
+    .ghost{ background: rgba(255,255,255,.06); }
 
-    /* No blur */
+    /* No effects */
     #no{
       position: relative;
       background: rgba(255,255,255,.08);
+      overflow: hidden;
     }
     .blurred{
       filter: blur(9px);
       opacity: .55;
       pointer-events:none;
+    }
+
+    /* Glitch overlay when No is attempted */
+    .glitch::before{
+      content:"";
+      position:absolute;
+      inset:-4px;
+      background:
+        linear-gradient(90deg, transparent, rgba(255,80,60,.25), transparent),
+        repeating-linear-gradient(to right, rgba(255,255,255,.10), rgba(255,255,255,.10) 1px, transparent 1px, transparent 6px);
+      mix-blend-mode: screen;
+      opacity:.65;
+      animation: glitchMove .18s steps(2,end) infinite;
+      pointer-events:none;
+    }
+    @keyframes glitchMove{
+      0%{ transform: translateX(-2px); }
+      50%{ transform: translateX(2px); }
+      100%{ transform: translateX(-1px); }
+    }
+
+    /* Card shake for emergency moment */
+    .shake{
+      animation: shake .32s ease-in-out 1;
+    }
+    @keyframes shake{
+      0%{ transform: translateX(0); }
+      20%{ transform: translateX(-4px); }
+      40%{ transform: translateX(4px); }
+      60%{ transform: translateX(-3px); }
+      80%{ transform: translateX(3px); }
+      100%{ transform: translateX(0); }
+    }
+
+    /* Red flash overlay when "No" is attempted */
+    .flash{
+      position:absolute;
+      inset:0;
+      background: rgba(255,80,60,.12);
+      opacity:0;
+      pointer-events:none;
+    }
+    .flash.on{
+      animation: flash .55s ease-out 1;
+    }
+    @keyframes flash{
+      0%{ opacity:0; }
+      25%{ opacity:1; }
+      100%{ opacity:0; }
+    }
+
+    /* ACCESS DENIED stamp */
+    .stamp{
+      display:none;
+      margin-top: 14px;
+      text-align:center;
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255, 120, 110, .95);
+      user-select:none;
+    }
+    .stamp.on{
+      display:block;
+      animation: stampPop .35s cubic-bezier(.2,.9,.2,1) both;
+    }
+    @keyframes stampPop{
+      from{ opacity:0; transform: scale(.96) translateY(6px); filter: blur(1px); }
+      to{ opacity:1; transform: scale(1) translateY(0); filter: blur(0); }
     }
 
     /* Success box */
@@ -182,7 +343,7 @@
       border-radius: 16px;
       border: 1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
-      animation: rise .34s ease both;
+      animation: rise .42s cubic-bezier(.2,.8,.2,1) both;
       text-align:left;
     }
     .success strong{
@@ -191,7 +352,6 @@
       letter-spacing: -0.01em;
     }
 
-    /* Footer hint */
     .hint{
       margin-top: 14px;
       text-align:center;
@@ -199,75 +359,85 @@
       font-size: 12px;
     }
 
-    /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
-      .step{ animation:none; }
+      .step, .badge.emergency, .badge.emergency .dot, .scan, .suspense::after { animation:none; }
       button{ transition:none; }
     }
   </style>
 </head>
 
 <body>
+  <canvas id="confettiCanvas"></canvas>
+
   <div class="wrap">
-    <div class="card" role="application" aria-label="Valentine decision">
+    <div class="card" id="card">
       <div class="glow"></div>
+      <div class="scan"></div>
+      <div class="flash" id="flash"></div>
 
       <header>
-        <span class="badge" id="badge">⚠️ System Alert</span>
+        <span class="badge emergency" id="badge"><span class="dot"></span> SYSTEM ALERT</span>
+        <span class="status" id="status">PRIORITY: EMERGENCY</span>
       </header>
 
       <main>
         <!-- STEP 1 -->
         <section class="step active" id="step1">
-          <h1>Bumstand has reached a crucial point.</h1>
-          <p>There is a decision to be made here.</p>
+          <h1>Emergency for Bumstand.</h1>
+          <p>Director A, you need to make a decision and answer crucial questions here.</p>
 
           <div class="buttons">
-            <button class="primary" id="to2">Proceed</button>
+            <button class="primary" id="to2">Acknowledge</button>
           </div>
 
-          <div class="hint">This page is monitored by the Department of Romance.</div>
+          <div class="hint">This interface is live. Your response is being recorded.</div>
         </section>
 
         <!-- STEP 2 -->
         <section class="step" id="step2">
-          <h1>What decision?</h1>
-          <p>Only one option leads to peace, joy, and suspiciously good photos.</p>
+          <h1><span class="suspense">Suspense</span>, Director A…</h1>
+          <p>You are being asked if you’ll be Director B’s Valentine.</p>
 
           <div class="buttons">
-            <button class="primary" id="to3">Reveal</button>
+            <button class="primary" id="to3">Proceed to Question</button>
             <button class="ghost" id="back1">Back</button>
           </div>
 
-          <div class="hint">Choose wisely. The universe is watching.</div>
+          <div class="hint">This is the part where you pretend you’re not smiling.</div>
         </section>
 
         <!-- STEP 3 -->
         <section class="step" id="step3">
           <h1>Will you be my Valentine?</h1>
-          <p>You may attempt to select “No”. You will not succeed.</p>
+          <p>You may attempt “No”. The system will respond accordingly.</p>
 
           <div class="buttons" aria-label="Valentine response buttons">
             <button class="primary" id="yes">YES 💘</button>
             <button id="no" aria-label="No (not available)">No</button>
           </div>
 
+          <div class="stamp" id="stamp">ACCESS DENIED • EMERGENCY OVERRIDE</div>
+
           <div class="success" id="success" aria-live="polite">
-            <strong>Correct.</strong>
-            <div>Now screenshot this and send it to me as proof 😌</div>
+            <strong>Confirmed.</strong>
+            <div>Confetti protocol initiated. Screenshot this and send it to me 😌</div>
           </div>
 
           <div class="divider"></div>
           <div class="tiny">Legally binding in the Court of Bumstand.</div>
         </section>
 
-        <div class="tiny" id="tinyFooter">Minimal design. Maximum emotional damage.</div>
+        <div class="tiny">Minimal design. Maximum drama.</div>
       </main>
     </div>
   </div>
 
   <script>
+    // -------- Step logic --------
+    const card = document.getElementById("card");
+    const flash = document.getElementById("flash");
     const badge = document.getElementById("badge");
+    const status = document.getElementById("status");
 
     const step1 = document.getElementById("step1");
     const step2 = document.getElementById("step2");
@@ -279,23 +449,29 @@
 
     const yes = document.getElementById("yes");
     const no = document.getElementById("no");
+    const stamp = document.getElementById("stamp");
     const success = document.getElementById("success");
 
     function showStep(n){
       [step1, step2, step3].forEach(s => s.classList.remove("active"));
       if(n === 1){
         step1.classList.add("active");
-        badge.textContent = "⚠️ System Alert";
+        badge.innerHTML = '<span class="dot"></span> SYSTEM ALERT';
+        badge.classList.add("emergency");
+        status.textContent = "PRIORITY: EMERGENCY";
       }
       if(n === 2){
         step2.classList.add("active");
-        badge.textContent = "🗳️ Decision Mode";
+        badge.innerHTML = '<span class="dot"></span> CONTROL ROOM';
+        badge.classList.add("emergency");
+        status.textContent = "STATUS: AWAITING ANSWER";
       }
       if(n === 3){
         step3.classList.add("active");
-        badge.textContent = "💘 Final Question";
-        // small UX: focus Yes so the path is clear
-        setTimeout(() => yes.focus(), 120);
+        badge.innerHTML = '<span class="dot"></span> FINAL PROMPT';
+        badge.classList.add("emergency");
+        status.textContent = "DIRECTIVE: SELECT YES";
+        setTimeout(() => yes.focus(), 140);
       }
     }
 
@@ -303,22 +479,139 @@
     to3.addEventListener("click", () => showStep(3));
     back1.addEventListener("click", () => showStep(1));
 
-    // Make "No" blur the instant he tries anything (desktop + mobile)
-    function disableNo(){
-      no.classList.add("blurred");
+    // -------- Dramatic "No" sequence --------
+    let noDisabled = false;
+
+    function triggerNoDrama(){
+      if(noDisabled) return;
+      noDisabled = true;
+
+      // flash + shake
+      flash.classList.remove("on");
+      void flash.offsetWidth;
+      flash.classList.add("on");
+
+      card.classList.remove("shake");
+      void card.offsetWidth;
+      card.classList.add("shake");
+
+      // glitch the No button then blur it
+      no.classList.add("glitch");
+      setTimeout(() => {
+        no.classList.add("blurred");
+      }, 120);
+
+      // show ACCESS DENIED stamp
+      stamp.classList.add("on");
+
+      // auto focus yes
       yes.focus();
+
+      // stop glitch after a moment (keeps blur)
+      setTimeout(() => {
+        no.classList.remove("glitch");
+      }, 650);
     }
 
-    no.addEventListener("mouseenter", disableNo);
-    no.addEventListener("mouseover", disableNo);
-    no.addEventListener("touchstart", disableNo, { passive: true });
-    no.addEventListener("click", (e) => { e.preventDefault(); disableNo(); });
+    no.addEventListener("mouseenter", triggerNoDrama);
+    no.addEventListener("mouseover", triggerNoDrama);
+    no.addEventListener("touchstart", triggerNoDrama, { passive:true });
+    no.addEventListener("click", (e) => { e.preventDefault(); triggerNoDrama(); });
 
+    // -------- Confetti (no libraries) --------
+    const canvas = document.getElementById("confettiCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resize(){
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    let confetti = [];
+    let confettiRunning = false;
+
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+
+    function launchConfetti(){
+      confetti = [];
+      const count = 180;
+
+      for(let i=0;i<count;i++){
+        confetti.push({
+          x: rand(0, window.innerWidth),
+          y: rand(-20, -window.innerHeight * 0.2),
+          vx: rand(-2.5, 2.5),
+          vy: rand(2.5, 6.5),
+          rot: rand(0, Math.PI*2),
+          vr: rand(-0.2, 0.2),
+          w: rand(6, 10),
+          h: rand(10, 16),
+          // Use a few neon-ish tones that match the theme
+          c: [ "rgba(255,60,120,.95)", "rgba(120,90,255,.95)", "rgba(80,255,180,.90)", "rgba(255,255,255,.85)" ][Math.floor(rand(0,4))],
+          life: rand(120, 190)
+        });
+      }
+
+      confettiRunning = true;
+      requestAnimationFrame(tickConfetti);
+      // auto stop after ~4 seconds
+      setTimeout(() => { confettiRunning = false; }, 4200);
+    }
+
+    function tickConfetti(){
+      ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+
+      for(const p of confetti){
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.03; // gravity
+        p.rot += p.vr;
+        p.life -= 1;
+
+        // wrap / bounce lightly
+        if(p.x < -20) p.x = window.innerWidth + 20;
+        if(p.x > window.innerWidth + 20) p.x = -20;
+
+        // draw
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      }
+
+      confetti = confetti.filter(p => p.life > 0 && p.y < window.innerHeight + 40);
+
+      if(confettiRunning && confetti.length){
+        requestAnimationFrame(tickConfetti);
+      } else {
+        ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+      }
+    }
+
+    // -------- YES click --------
     yes.addEventListener("click", () => {
       success.style.display = "block";
-      yes.textContent = "YES 💘 (locked in)";
+      yes.textContent = "YES 💘 (confirmed)";
       yes.disabled = true;
       yes.style.opacity = "0.88";
+
+      // soften emergency status after yes
+      status.textContent = "STATUS: CRISIS RESOLVED";
+      badge.classList.remove("emergency");
+      badge.style.background = "rgba(80,255,180,.10)";
+      badge.style.borderColor = "rgba(80,255,180,.35)";
+      badge.innerHTML = '<span class="dot"></span> SUCCESS';
+      badge.querySelector(".dot").style.background = "rgba(80,255,180,.90)";
+
+      // confetti!!!
+      launchConfetti();
     });
   </script>
 </body>
