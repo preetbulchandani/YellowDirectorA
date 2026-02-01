@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Important Question</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      background: #fff; color: #111;
+    }
+    .card {
+      width: min(560px, 92vw);
+      border: 1px solid #eee;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+      text-align: center;
+    }
+    h1 { margin: 0 0 10px; font-size: 34px; letter-spacing: -0.02em; }
+    p { margin: 0 0 22px; opacity: .8; line-height: 1.4; }
+    .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    button {
+      border: 0; border-radius: 999px; padding: 14px 22px;
+      font-size: 16px; cursor: pointer;
+      transition: transform .08s ease, filter .2s ease, opacity .2s ease;
+    }
+    #yes {
+      background: #111; color: #fff;
+    }
+    #yes:active { transform: scale(.98); }
+
+    #no {
+      background: #f3f3f3; color: #111;
+      position: relative;
+    }
+    /* When "No" is attempted, we blur it */
+    .blurred {
+      filter: blur(7px);
+      opacity: .55;
+      pointer-events: none; /* makes it unusable */
+    }
+
+    .tiny {
+      margin-top: 16px;
+      font-size: 12px;
+      opacity: .55;
+    }
+
+    .success {
+      display: none;
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 14px;
+      background: #f7f7f7;
+    }
+    .success strong { display: block; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Will you be my Valentine?</h1>
+    <p>Choose wisely. There is a correct answer.</p>
+
+    <div class="buttons">
+      <button id="yes">YES 💘</button>
+      <button id="no">No</button>
+    </div>
+
+    <div class="success" id="success">
+      <strong>Correct.</strong>
+      <div>Now screenshot this and send it to me as proof 😌</div>
+    </div>
+
+    <div class="tiny">This website is legally binding in the court of romance.</div>
+  </div>
+
+  <script>
+    const yes = document.getElementById("yes");
+    const no = document.getElementById("no");
+    const success = document.getElementById("success");
+
+    // Make "No" blur as soon as he tries anything: hover, touch, click
+    const disableNo = () => {
+      no.classList.add("blurred");
+      // Optional: move focus to YES so it's the only obvious choice
+      yes.focus();
+    };
+
+    no.addEventListener("mouseenter", disableNo);
+    no.addEventListener("mouseover", disableNo);
+    no.addEventListener("touchstart", disableNo, { passive: true });
+    no.addEventListener("click", (e) => { e.preventDefault(); disableNo(); });
+
+    yes.addEventListener("click", () => {
+      success.style.display = "block";
+      // Optional: confetti-ish vibe without libraries
+      yes.textContent = "YES 💘 (locked in)";
+      yes.disabled = true;
+      yes.style.opacity = "0.85";
+    });
+  </script>
+</body>
+</html>
